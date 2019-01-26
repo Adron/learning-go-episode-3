@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math"
 	"strconv"
 )
 
 const (
-	width, height = 600, 320
+	width, height = 600, 600
 	cells         = 100
 	xyrange       = 30.0
 	xyscale       = width / 2 / xyrange
@@ -22,7 +23,7 @@ func main() {
 	var outputResult string
 
 	outputResult = "<svg xmlns='http://www.w3.org/2000/svg' " +
-		"style='stroke: grey; fill: white; stroke-width: 0.7' " +
+		"style='stroke: blue; fill: white; stroke-width: 0.7' " +
 		"width='" + strconv.Itoa(width) + "' height='" + strconv.Itoa(height) + "'>"
 
 	for i := 0; i < cells; i++ {
@@ -37,11 +38,15 @@ func main() {
 				bx + "," + by +
 				cx + "," + cy +
 				dx + "," + dy +
-				"/>\n"
+				"'/>\n"
 		}
 	}
 	outputResult = outputResult + "</svg>"
 	fmt.Printf(outputResult)
+	err := ioutil.WriteFile("surface-plot.svg", []byte(outputResult), 0644)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
 }
 
 func corner(i, j int) (string, string) {
@@ -50,7 +55,7 @@ func corner(i, j int) (string, string) {
 
 	z := f(x, y)
 
-	sx := width/2 + (x+y)*cos30*xyscale
+	sx := width/2 + (x-y)*cos30*xyscale
 	sy := height/2 + (x+y)*sin30*xyscale - z*zscale
 
 	xResult := strconv.FormatFloat(sx, 'f', -1, 64)
